@@ -13,6 +13,7 @@ app.use(morgan('dev'))
 app.use(bodyParser.json())
 app.use(formidable())
 
+app.use('/gallery', require('./routes/gallery'))
 app.get('/ping', (req, res) => {
   res.send('pong')
 })
