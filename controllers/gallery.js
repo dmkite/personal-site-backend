@@ -1,8 +1,8 @@
 const model = require('../models/gallery')
 
-const getGallery = (req, res) => {
+const getGallery = async (req, res) => {
   try {
-    const galleryContent = model.getGallery()
+    const galleryContent = await model.getGallery()
     console.log(galleryContent)
     galleryContent
       ? res.status(200).send(galleryContent)
