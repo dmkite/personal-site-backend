@@ -12,7 +12,8 @@
       "options": [
         "allow-snake-case"
       ]
-    }
+    },
+    "no-console": [false]
   },
   "rulesDirectory": []
 }

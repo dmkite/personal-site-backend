@@ -6,21 +6,21 @@ export class Gallery {
   @PrimaryGeneratedColumn()
     public id: number;
 
-  @Column()
+  @Column({length: 30})
     public title: string;
 
-  @Column()
+  @Column({length: 300})
     public description: string;
 
-  @Column()
-    public clip_type: string;
+  @Column("int")
+  public height: number;
 
-  @Column()
-    public height: number;
+  @Column("int")
+  public width: number;
 
-  @Column()
-    public width: number;
+  @Column("text")
+    public thumbnail: string;
 
-  @Column()
-    public url: string;
+  @Column("text")
+    public image: string;
 }

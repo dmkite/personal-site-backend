@@ -3,7 +3,7 @@
    "host": "45.55.179.56",
    "port": 3306,
    "username": "dylan",
-   "password": "DMKite92!",
+
    "database": "personal_site",
    "synchronize": true,
    "logging": false,
