@@ -5,11 +5,15 @@ import contactModel from "../models/contact";
 
 class ContactController {
   public sendMessage = async (req: Request, res: Response) => {
-    console.log("sendmessage made");
     if (!req.body) {
       return res.status(400).send({message: "a request body must be present"});
     }
-    const {name, email, message: msg} = req.body;
+    const {name, email, message: msg, token: reqToken} = req.body;
+
+    let hasWaited: boolean = true;
+    if (reqToken) { hasWaited = this.checkToken(reqToken); }
+    if (!hasWaited) { return res.status(429).send({message: "You've been doing that alot. Wait a little while and try again"}); }
+
     const isValidReq: boolean = this.isValidReq(name, email, msg);
     if (!isValidReq) {
       return res.status(400).send({message: "name, email, or message are incorrectly formatted"});
@@ -29,6 +33,7 @@ class ContactController {
   public checkToken = (token: string): boolean => {
     const decoded: any = jwt.verify(token, credentials.privateKey);
     if (decoded) {
+      console.log(decoded);
       return Number(decoded.timestamp) - Date.now() > 300000;
     } else {
       return false;

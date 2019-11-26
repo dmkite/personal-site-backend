@@ -48,11 +48,16 @@ class GalleryModel {
     if (!connection) {
       return [];
     }
-    const galleryItems = await connection.manager.find(Gallery);
-    if (!galleryItems || ! galleryItems.length) {
-      return [];
-    } else {
-      return galleryItems;
+    try {
+      const galleryItems = await connection.manager.find(Gallery);
+      if (!galleryItems || ! galleryItems.length) {
+        return [];
+      } else {
+        return galleryItems;
+      }
+    } catch (err) {
+      console.log(err);
+      return null;
     }
 
   }

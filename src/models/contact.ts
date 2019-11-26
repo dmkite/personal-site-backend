@@ -1,4 +1,3 @@
-// import nodemailer from "nodemailer";
 import AWS from "aws-sdk";
 AWS.config.update({ region: "us-west-2" });
 
@@ -65,37 +64,6 @@ class ContactModel {
       return false;
     }
   }
-  // transporter = nodemailer.createTransport({
-  //   auth: {
-  //     pass: testAccount.pass,
-  //     user: testAccount.user
-  //   },
-  //   host: "smtp.ethereal.email",
-  //   port: 587,
-  //   secure: false
-  // });
-  // public sendMessage = async (name: string, email: string, msg: string) => {
-  //   console.log("from model");
-  //   try {
-  //     const testAccount = await nodemailer.createTestAccount();
-  //     console.log({testAccount});
-  //     console.log({transporter: this.transporter});
-  //     const info = await this.transporter.sendMail({
-  //       from: `"${name}" <${email}>`,
-  //       html: `<p>${msg}</p>`,
-  //       subject: "email from personal site",
-  //       text: msg,
-  //       to: "kite.d92@gmail.com"
-  //     });
-  //     console.log({info});
-  //     console.log(`Mesage sent: %s\n ${info.messageId}`);
-  //     console.log(`Preview URL: %s\n${nodemailer.getTestMessageUrl(info)}`);
-  //     return true;
-  //   } catch (err) {
-  //     console.error(err);
-  //     return false;
-  //   }
-  // }
 }
 
 const contactModel = new ContactModel();
