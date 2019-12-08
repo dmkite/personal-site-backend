@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, {NextFunction, Request, Response} from "express";
 import morgan from "morgan";
-import path from "path";
 import {factory} from "./ConfigLog4j";
 import contactController from "./src/controllers/contact";
 import HttpException from "./src/exceptions/HttpException";
@@ -25,7 +24,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-app.get("/*", (req, res) => res.sendFile(path.join(__dirname + "/../front-end/build/index.html")) );
+app.get("/*", (req, res) => res.sendFile(process.env.PATH_TO_BUILD) );
 
 app.use((req, res, next) => {
   res.status(404).send({ message: "the endpoint you're looking for doesn't exist" });

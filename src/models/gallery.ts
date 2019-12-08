@@ -38,7 +38,6 @@ class GalleryModel {
       return true;
     } catch (error) {
         this.logger.error(error);
-        this.logger.info(error);
         return false;
     }
   }
@@ -46,11 +45,13 @@ class GalleryModel {
   public getGallery = async (): Promise<Gallery[]> => {
     const connection: Connection | null = await this.createConnection();
     if (!connection) {
+      console.log("no connection");
       return [];
     }
     try {
       const galleryItems = await connection.manager.find(Gallery);
       if (!galleryItems || ! galleryItems.length) {
+        console.log("no gallery items");
         return [];
       } else {
         return galleryItems;
@@ -58,6 +59,8 @@ class GalleryModel {
     } catch (err) {
       console.log(err);
       return null;
+    } finally {
+      await connection.close();
     }
 
   }
