@@ -4,6 +4,7 @@ import {credentials} from "../../../credentials";
 import {factory} from "../../ConfigLog4j";
 import {IGalleryTuple} from "../controllers/gallery";
 import { Gallery } from "../entity/Gallery";
+import Model from "./Model";
 
 export interface IGalleryItem {
   title: string;
@@ -14,8 +15,11 @@ export interface IGalleryItem {
   thumbnail: string;
 }
 
-class GalleryModel {
+class GalleryModel extends Model {
   private logger = factory.getLogger("model.Gallery");
+  constructor() {
+    super();
+  }
 
   public addItem = async (reqBody: IGalleryTuple): Promise<boolean> => {
     try {
@@ -43,8 +47,9 @@ class GalleryModel {
     }
   }
 
-  public getGallery = async (): Promise<Gallery[]> => {
-    const connection: Connection | null = await this.createConnection();
+  public async getGallery(): Promise<Gallery[]> {
+    const connection: Connection | null = await super.createConnection();
+    console.log(connection);
     if (!connection) {
       return [];
     }
@@ -58,10 +63,14 @@ class GalleryModel {
     } catch (err) {
       console.log(err);
       return null;
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
     }
 
   }
-
+/*
   private createConnection = async () => {
     try {
       const connection: Connection = await createConnection({
@@ -77,9 +86,11 @@ class GalleryModel {
       });
       return connection;
     } catch (err) {
+      console.log(err);
       return null;
     }
   }
+  */
 }
 
 const galleryModel = new GalleryModel();
