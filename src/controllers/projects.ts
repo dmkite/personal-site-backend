@@ -1,19 +1,15 @@
 import { Request, Response } from "express";
 import projectModel, {IProjectTuple} from "../models/projects";
 
-interface ISpec {
-  [key: string]: string;
-}
-
-interface IDesc {
-  [key: string]: string;
+interface IKeyVal {
+  [key: string]: string | number;
 }
 
 interface ITransformedData {
   title: string;
   svg: string;
-  specs: ISpec[];
-  description: IDesc[];
+  specs: IKeyVal[];
+  desc: IKeyVal[];
 }
 
 export const getProjects = async (req: Request, res: Response): Promise<Response> => {
@@ -28,7 +24,14 @@ export const getProjects = async (req: Request, res: Response): Promise<Response
 };
 
 const transformData = (data: IProjectTuple[]): ITransformedData[] => {
-  return [];
+  const transformedData: ITransformedData[] = data.map( (d) => {
+    const {title, description, architecture, svg, impact, units, framework, platform} = d;
+    const specs: IKeyVal[] = [{title}, {framework}, {platform}, {units}];
+    const desc: IKeyVal[] = [{description}, {architecture}, {impact} ];
+    return {title, svg, specs, desc};
+  });
+  console.log(transformedData);
+  return transformedData;
 
 };
 

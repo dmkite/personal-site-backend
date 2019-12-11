@@ -3,7 +3,6 @@ import { Connection, ConnectionOptionsReader, createConnection } from "typeorm";
 import { credentials } from "../../../credentials";
 import { factory } from "../../ConfigLog4j";
 import { Project } from "../entity/Project";
-import Model from "./Model";
 
 export interface IProjectTuple {
   title: string;
@@ -16,16 +15,13 @@ export interface IProjectTuple {
   units: number;
 }
 
-class ProjectModel extends Model {
+class ProjectModel {
   private logger = factory.getLogger("model.Project");
-  constructor() {
-    super();
-  }
 
   public async addProject(reqBody: IProjectTuple): Promise<boolean> {
     let connection: Connection | null = null;
     try {
-      connection = await super.createConnection();
+      connection = await this.createConnection();
       let project = new Project();
       project = Object.assign(project, reqBody);
       await connection.manager.save(project);
@@ -42,8 +38,7 @@ class ProjectModel extends Model {
   public async getProjects(): Promise<Project[]> {
     let connection: Connection | null = null;
     try {
-      connection = await super.createConnection();
-      console.log(connection);
+      connection = await this.createConnection();
       if (!connection) {
         return [];
       }
@@ -52,14 +47,32 @@ class ProjectModel extends Model {
         ? projects
         : [];
     } catch (err) {
-      console.log("++++++++++++++++++++");
-      console.log(err);
       this.logger.warn(err);
       return null;
     } finally {
       if (connection) {
         await connection.close();
       }
+    }
+  }
+
+  public createConnection = async () => {
+    try {
+      const connection: Connection = await createConnection({
+        database: "personal_site",
+        entities: [`${__dirname}/../entity/*.ts`],
+        host: "45.55.179.56",
+        logging: false,
+        password: credentials.mysqlPassword,
+        port: 3306,
+        synchronize: true,
+        type: "mysql",
+        username: "dylan"
+      });
+      return connection;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   }
 }
