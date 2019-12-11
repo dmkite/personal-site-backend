@@ -43,7 +43,7 @@ class GalleryModel {
     }
   }
 
-  public getGallery = async (): Promise<Gallery[]> => {
+  public async getGallery(): Promise<Gallery[]> {
     const connection: Connection | null = await this.createConnection();
     if (!connection) {
       return [];
@@ -58,11 +58,14 @@ class GalleryModel {
     } catch (err) {
       console.log(err);
       return null;
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
     }
 
   }
-
-  private createConnection = async () => {
+  public createConnection = async () => {
     try {
       const connection: Connection = await createConnection({
         database: "personal_site",
@@ -77,6 +80,7 @@ class GalleryModel {
       });
       return connection;
     } catch (err) {
+      console.log(err);
       return null;
     }
   }
