@@ -6,6 +6,7 @@ import morgan from "morgan";
 import {factory} from "./ConfigLog4j";
 import contactController from "./src/controllers/contact";
 import HttpException from "./src/exceptions/HttpException";
+import authRouter from "./src/routes/auth";
 import galleryRouter from "./src/routes/gallery";
 import projectRouter from "./src/routes/project";
 
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 app.use("/api/gallery", galleryRouter);
 app.post("/api/contact", contactController.sendMessage);
 app.use("/api/projects", projectRouter);
+app.use("/api/auth", authRouter);
 
 app.get("/ping", (req, res) => {
   res.send("pong");

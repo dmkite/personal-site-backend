@@ -5,6 +5,8 @@ import {factory} from "../../ConfigLog4j";
 import {IGalleryTuple} from "../controllers/gallery";
 import { Gallery } from "../entity/Gallery";
 
+import Model from "./Model";
+
 export interface IGalleryItem {
   title: string;
   description: string;
@@ -87,5 +89,9 @@ class GalleryModel {
   }
 }
 
-const galleryModel = new GalleryModel();
+// const galleryModel = new GalleryModel();
+
+const galleryModel = new Model("Gallery", Gallery, );
 export default galleryModel;
+
+// export default galleryModel;

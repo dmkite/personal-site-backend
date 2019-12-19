@@ -14,7 +14,7 @@ export interface IGalleryTuple {
 
 export const getGallery = async (req: Request, res: Response) => {
   try {
-    const galleryContent: Gallery[] = await galleryModel.getGallery();
+    const galleryContent: any[] = await galleryModel.getItems();
     galleryContent && galleryContent.length
       ? res.status(200).send(galleryContent)
       : res.status(404).send({ message: "no gallery content available" });
