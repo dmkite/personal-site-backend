@@ -19,6 +19,7 @@ export const getGallery = async (req: Request, res: Response) => {
       ? res.status(200).send(galleryContent)
       : res.status(404).send({ message: "no gallery content available" });
   } catch (err) {
+    console.log(err);
     res.status(500).send({ message: err });
   }
 };
@@ -39,7 +40,7 @@ export const addToGallery = async (req: Request, res: Response) => {
   }
 };
 
-const isValidReq = (reqBody: any) => {
+const isValidReq = (reqBody: any): boolean => {
   if (typeof reqBody !== "object") { return false; }
   const necessaryValues: string[] = [
     "title",

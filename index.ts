@@ -6,7 +6,9 @@ import morgan from "morgan";
 import {factory} from "./ConfigLog4j";
 import contactController from "./src/controllers/contact";
 import HttpException from "./src/exceptions/HttpException";
-import router from "./src/routes/gallery";
+import galleryRouter from "./src/routes/gallery";
+import projectRouter from "./src/routes/project";
+
 const log = factory.getLogger("server");
 
 const port: string = process.env.PORT || "8080";
@@ -17,8 +19,9 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 
-app.use("/api/gallery", router);
+app.use("/api/gallery", galleryRouter);
 app.post("/api/contact", contactController.sendMessage);
+app.use("/api/projects", projectRouter);
 
 app.get("/ping", (req, res) => {
   res.send("pong");
