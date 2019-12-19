@@ -1,19 +1,16 @@
-import {Connection, createConnection} from "typeorm";
-import { credentials } from "../../../credentials";
+import * as bluebird from "bluebird";
+import * as redis from "redis";
+const redisAsync: any = bluebird.Promise.promisifyAll(redis);
 import {factory} from "../../ConfigLog4j";
 
 interface IModel {
-  // logger: any
-  // entity: any
-  // returnType: any
-  // createConnection(): Promise<Connection | null>
-  getItems(): any;
-  addItem(item: any): Promise<boolean>;
+  getItems(key: string): Promise<any[]>;
+  addItem(key: string, entry: any): any;
   updateItem(id: number): boolean;
   deleteItem(id: number): boolean;
 }
 
-export default class Model<T> implements IModel {
+export default class Model implements IModel {
   public logger: any;
   public entity: any;
   // returnType: any
@@ -24,46 +21,30 @@ export default class Model<T> implements IModel {
 
   }
 
-  public getItems = async (): Promise<T[]> => {
-    const connection: Connection | null = await this.createConnection();
-    if (!connection) {
-      return [];
-    }
-    try {
-      const results = await connection.manager.find(this.entity);
-      if (!results || !results.length) {
-        return [];
-      }
-    } catch (err) {
-      console.log(err);
-      return null;
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
+  public getItems = async (key: string): Promise<any[]> => {
+    const client = this.createClient();
+    return client.getAsync(key)
+      .then( (res: any) => {
+        return res;
+      })
+      .catch( (err: any) => {
+        console.log(err);
+      });
   }
 
-  public addItem = async (entry: any): Promise<boolean> => {
-    const connection: Connection | null = await this.createConnection();
-    if (!connection) {
+  public addItem = async (key: string, entry: any) => {
+    const client = this.createClient();
+    let hasError = false;
+    client.on("error", (err: any) => {
+      hasError = true;
+      console.log("Error " + err);
+  });
+    client.set(key, entry);
+    if (hasError) {
       return false;
-    }
-    try {
-      let item = new this.entity();
-      item = Object.assign(item, entry);
-      await connection.manager.save(item);
-      this.logger.info(`successfully saved the following record\n${String(entry)}`);
+    } else {
       return true;
-    } catch (err) {
-      this.logger.error(err);
-      return false;
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
     }
-
   }
 
   public updateItem = (id: number): boolean => {
@@ -74,23 +55,16 @@ export default class Model<T> implements IModel {
     return true;
   }
 
-  private createConnection = async () => {
-    try {
-      const connection: Connection = await createConnection({
-        database: "personal_site",
-        entities: [`${__dirname}/../entity/*.ts`],
-        host: "45.55.179.56",
-        logging: false,
-        password: credentials.mysqlPassword,
-        port: 3306,
-        synchronize: true,
-        type: "mysql",
-        username: "dylan"
-      });
-      return connection;
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
+  public createClient = () => {
+    const redisOptions = {
+      db: 1,
+      host: "127.0.0.1",
+      port: 6379,
+
+    };
+    // bluebird.promisifyAll(redis.RedisClient.prototype);
+    // bluebird.promisifyAll(redis.Multi.prototype);
+    const client = redisAsync.createClient(redisOptions);
+    return client;
   }
 }

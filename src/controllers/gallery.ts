@@ -13,30 +13,40 @@ export interface IGalleryTuple {
 }
 
 export const getGallery = async (req: Request, res: Response) => {
-  try {
-    const galleryContent: any[] = await galleryModel.getItems();
-    galleryContent && galleryContent.length
-      ? res.status(200).send(galleryContent)
-      : res.status(404).send({ message: "no gallery content available" });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: err });
+  const galleryItems = await galleryModel.getItems("gallery");
+  console.log(galleryItems, "dsdsdsd");
+  if (galleryItems) {
+    res.status(200).send(galleryItems);
+  } else {
+    res.status(404).send({message: "no items found"});
   }
+//   try {
+//     const galleryContent: any[] = await galleryModel.getItems();
+//     galleryContent && galleryContent.length
+//       ? res.status(200).send(galleryContent)
+//       : res.status(404).send({ message: "no gallery content available" });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send({ message: err });
+//   }
+// };
+
+// export const addToGallery = async (req: Request, res: Response) => {
+//   if (!isValidReq(req.body)) {
+//     res.status(400).send({message: "Incorrect format for gallery items"});
+//   }
 };
 
-export const addToGallery = async (req: Request, res: Response) => {
-  if (!isValidReq(req.body)) {
-    res.status(400).send({message: "Incorrect format for gallery items"});
+export const addToGallery = (req: Request, res: Response) => {
+  if (!req || !req.body || !req.body.key || !req.body.entry) {
+    return res.status(400).send({message: "missing vital request information"});
   }
-  try {
-    const entryWasSuccessful: boolean = await galleryModel.addItem(req.body);
-    if (entryWasSuccessful) {
-      res.status(201).send({message: "successfully added"});
-    } else {
-      res.status(400).send({message: "nope"});
-    }
-  } catch (err) {
-    res.status(500).send({message: err});
+  const {key, entry} = req.body;
+  const successfullyAdded = galleryModel.addItem(key, entry);
+  if (!successfullyAdded) {
+    return res.status(500).send({message: "failed to add item"});
+  } else {
+    return res.status(200).send({message: "successfully added item"});
   }
 };
 
