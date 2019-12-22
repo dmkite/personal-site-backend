@@ -1,67 +1,94 @@
 import {Request, Response} from "express";
-import {Gallery} from "../entity/Gallery";
 import galleryModel from "../models/gallery";
+import { RedisKeys } from "../utils/redisConstants";
 
-export interface IGalleryTuple {
-  id: number;
-  title: string;
-  description: string;
-  height: number;
-  width: number;
-  url: string;
-  thumbnail: number;
-}
+// export interface IGalleryTuple {
+//   id: number;
+//   title: string;
+//   desc: string;
+//   height: number;
+//   width: number;
+//   url: string;
+//   thumbnail: number;
+// }
 
-export const getGallery = async (req: Request, res: Response) => {
-  const galleryItems = await galleryModel.getItems("gallery");
-  console.log(galleryItems, "dsdsdsd");
-  if (galleryItems) {
-    res.status(200).send(galleryItems);
-  } else {
-    res.status(404).send({message: "no items found"});
-  }
-//   try {
-//     const galleryContent: any[] = await galleryModel.getItems();
-//     galleryContent && galleryContent.length
-//       ? res.status(200).send(galleryContent)
-//       : res.status(404).send({ message: "no gallery content available" });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send({ message: err });
+
+// export const getGallery = async (req: Request, res: Response) => {
+//   const galleryItems: IGalleryTuple[] = await galleryModel.getItems(RedisKeys.Gallery);
+//   if (!galleryItems) {
+//     return res.status(404).send({message: "no items found"});
+//   } else {
+//     return res.status(200).send(galleryItems);
 //   }
 // };
 
 // export const addToGallery = async (req: Request, res: Response) => {
-//   if (!isValidReq(req.body)) {
-//     res.status(400).send({message: "Incorrect format for gallery items"});
+//   if (!req || !req.body ) {
+//     return res.status(400).send({message: "missing vital request information"});
 //   }
+//   const successfullyAdded = await galleryModel.addItem(RedisKeys.Gallery, req.body);
+//   if (!successfullyAdded) {
+//     return res.status(500).send({message: "failed to add item"});
+//   } else {
+//     return res.status(200).send({message: `successfully added ${req.body.title}`});
+//   }
+// };
+
+// export const updateGalleryItem = async (req: Request, res: Response) => {
+//   if ( !isValidReq(req) ) {
+//     return res.status(400).send({message: "missing vital request information"});
+//   }
+//   const updatedSuccessfully: boolean = await galleryModel.updateItem(RedisKeys.Gallery, req.body);
+//   if (updatedSuccessfully) {
+//     return res.status(200).send({message: `Successfully updated ${req.body.title}`});
+//   } else {
+//     return res.status(500).send({message: "uh oh"});
+//   }
+// };
+
+// export const deleteGalleryItem = async (req: Request, res: Response) => {
+//   if (!isValidReq(req)) {
+//     return res.status(400).send({message: "An id is needed to delete"});
+//   }
+//   try {
+//     const deletedSuccessfully: boolean = await galleryModel.deleteItem(RedisKeys.Gallery, req.body.id);
+//     if (!deletedSuccessfully) {
+//       res.status(500).send({message: `Could not delete ${req.body.id}`});
+//     } else {
+//       res.status(200).send({message: `Deleted ${req.body.id}`});
+//     }
+//   } catch (err) {
+//     res.status(500).send({message: err});
+//   }
+// };
+
+const isValidReq = (req: Request): boolean => {
+  switch (req.method.toLowerCase()) {
+    case "post":
+    case "put":
+      if (!req.body || !hasValidValues(req.body)) {
+        return false;
+      }
+    case "delete":
+      if (!req.body || !req.body.id) {
+        return false;
+      }
+    default:
+      return true;
+  }
 };
 
-export const addToGallery = (req: Request, res: Response) => {
-  if (!req || !req.body || !req.body.key || !req.body.entry) {
-    return res.status(400).send({message: "missing vital request information"});
-  }
-  const {key, entry} = req.body;
-  const successfullyAdded = galleryModel.addItem(key, entry);
-  if (!successfullyAdded) {
-    return res.status(500).send({message: "failed to add item"});
-  } else {
-    return res.status(200).send({message: "successfully added item"});
-  }
-};
-
-const isValidReq = (reqBody: any): boolean => {
-  if (typeof reqBody !== "object") { return false; }
+const hasValidValues = (entry: any): boolean => {
   const necessaryValues: string[] = [
     "title",
-    "description",
+    "desc",
     "height",
     "width",
-    "url",
+    "image",
     "thumbnail"
   ];
   for (const v of necessaryValues) {
-    const isPresent: boolean = Boolean(reqBody[v]);
+    const isPresent: boolean = Boolean(entry[v]);
     if (!isPresent) { return false; }
   }
   return true;
