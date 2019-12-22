@@ -1,58 +1,84 @@
 import * as bluebird from "bluebird";
 import * as redis from "redis";
 const redisAsync: any = bluebird.Promise.promisifyAll(redis);
+import shortid from "shortid";
 import {factory} from "../../ConfigLog4j";
 
-interface IModel {
+export interface IModel {
   getItems(key: string): Promise<any[]>;
   addItem(key: string, entry: any): any;
-  updateItem(id: number): boolean;
-  deleteItem(id: number): boolean;
+  updateItem(key: string, entry: any): Promise<boolean>;
+  deleteItem(key: string, id: number): Promise<boolean>;
+}
+
+interface IItem {
+  [key: string]: any;
 }
 
 export default class Model implements IModel {
   public logger: any;
   public entity: any;
-  // returnType: any
   constructor(moduleName: string, entity: any) {
     this.logger = factory.getLogger(`model.${moduleName}`);
     this.entity = entity;
-    // this.returnType = returnType
-
   }
 
   public getItems = async (key: string): Promise<any[]> => {
     const client = this.createClient();
-    return client.getAsync(key)
-      .then( (res: any) => {
-        return res;
-      })
-      .catch( (err: any) => {
-        console.log(err);
+    try {
+      const items = await client.hgetallAsync(key);
+      Object.keys(items).forEach((id: string) => {
+        items[id] = JSON.parse(items[id]);
       });
+      return items;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   public addItem = async (key: string, entry: any) => {
     const client = this.createClient();
-    let hasError = false;
-    client.on("error", (err: any) => {
-      hasError = true;
-      console.log("Error " + err);
-  });
-    client.set(key, entry);
-    if (hasError) {
-      return false;
-    } else {
+    const id: string = shortid();
+    entry.id = id;
+    const jsonEntry: string = JSON.stringify(entry);
+    return client.hmsetAsync(key, [id, jsonEntry])
+    .then( (res: any) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err: any) => {
+      console.log(err);
+    });
+  }
+
+  public updateItem = async (key: string, entry: any): Promise<boolean> => {
+    const client = this.createClient();
+    try {
+      const items = await this.getItems(key);
+      items[entry.id] = entry;
+      const updatedJsonEntry: string = JSON.stringify(entry);
+      await client.hmsetAsync(key, [entry.id, updatedJsonEntry]);
       return true;
+    } catch (err) {
+      console.log(err);
+      return false;
     }
   }
 
-  public updateItem = (id: number): boolean => {
-    return true;
-  }
-
-  public deleteItem = (id: number): boolean => {
-    return true;
+  public deleteItem = async (key: string, id: number): Promise<boolean> => {
+    const client = this.createClient();
+    try {
+      const items: IItem = await this.getItems(key);
+      if (!items) {
+        return false;
+      }
+      client.hdelAsync(key, id);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   public createClient = () => {
@@ -62,8 +88,6 @@ export default class Model implements IModel {
       port: 6379,
 
     };
-    // bluebird.promisifyAll(redis.RedisClient.prototype);
-    // bluebird.promisifyAll(redis.Multi.prototype);
     const client = redisAsync.createClient(redisOptions);
     return client;
   }
