@@ -1,7 +1,7 @@
-import {Request, Response} from 'express'
-import {IModel} from '../models/Model'
+import {Request, Response} from "express";
+import {IModel} from "../models/Model";
 
-interface IGalleryItem {
+export interface IGalleryItem {
   id: number;
   title: string;
   desc: string;
@@ -11,40 +11,41 @@ interface IGalleryItem {
   thumbnail: number;
 }
 
-interface IProjectItem {
-  title: string
-  image: string
+export interface IProjectItem {
+  title: string;
+  image: string;
   specs: {
     units?: number
     framework: string
     platform: string
     persistence: string
-  },
+  };
   desc: {
     Description: string
     Architecture: string
     Impact: string
-  }
+  };
 }
 
 interface IController {
-  getItems(req: Request, res: Response): Promise<Response>
-  addItem(req: Request, res: Response): Promise<Response>
-  updateItem(req: Request, res: Response): Promise<Response>
-  deleteItem(req: Request, res: Response): Promise<Response>
+  getItems(req: Request, res: Response): Promise<Response>;
+  addItem(req: Request, res: Response): Promise<Response>;
+  updateItem(req: Request, res: Response): Promise<Response>;
+  deleteItem(req: Request, res: Response): Promise<Response>;
+  validateReq(req:Request): string | null
 }
 
 export default class Controller implements IController {
-  public reqValidation: (req:Request)=>boolean
-  public redisKey: string
-  public model: IModel
-  constructor(reqValidation: (req:Request)=>boolean, redisKey:string, model: IModel) {
-    this.reqValidation = reqValidation
-    this.redisKey = redisKey
-    this.model = model
+  public missingValueFinder: (req: Request) => string[];
+  public redisKey: string;
+  public model: IModel;
+  constructor(missingValueFinder: (req: Request) => string[], redisKey: string, model: IModel) {
+    this.missingValueFinder = missingValueFinder;
+    this.redisKey = redisKey;
+    this.model = model;
   }
 
-  getItems = async (req: Request, res: Response) => {
+  public getItems = async (req: Request, res: Response) => {
     try {
       const items: Array<IGalleryItem | IProjectItem> = await this.model.getItems(this.redisKey);
       if (!items) {
@@ -53,52 +54,69 @@ export default class Controller implements IController {
         return res.status(200).send(items);
       }
     } catch (err) {
-      return res.status(500).send({message: err})
+      return res.status(500).send({message: err});
     }
   }
 
-  addItem = async (req: Request, res: Response) => {
-    const isValidReq = this.reqValidation(req)
-    if (!isValidReq ) {
-      return res.status(400).send({message: "missing vital request information"});
+  public addItem = async (req: Request, res: Response) => {
+    const invalidDetails = this.validateReq(req);
+    if (invalidDetails) {
+      return res.status(400).send({message: invalidDetails});
     }
     try {
       const successfullyAdded = await this.model.addItem(this.redisKey, req.body);
       return successfullyAdded
         ? res.status(200).send({message: `successfully added ${req.body.title}`})
         : res.status(500).send({message: "failed to add item"});
-    } catch(err) {
-      return res.status(500).send({message:err})
+    } catch (err) {
+      return res.status(500).send({message: err});
     }
   }
 
-  updateItem = async (req: Request, res: Response) => {
-    const isValidReq = this.reqValidation(req)
-    if ( !isValidReq ) {
-      return res.status(400).send({message: "missing vital request information"});
+  public updateItem = async (req: Request, res: Response) => {
+    const invalidDetails = this.validateReq(req);
+    if ( invalidDetails ) {
+      return res.status(400).send({message: invalidDetails});
     }
     try {
       const updatedSuccessfully: boolean = await this.model.updateItem(this.redisKey, req.body);
       return updatedSuccessfully
         ? res.status(200).send({message: `Successfully updated ${req.body.title}`})
-        : res.status(500).send({message: `Could not update ${req.body.title}`})
+        : res.status(500).send({message: `Could not update ${req.body.title}`});
     } catch (err) {
-      return res.status(500).send({message: err})
+      return res.status(500).send({message: err});
     }
   }
 
-  deleteItem = async (req: Request, res: Response) => {
-    const isValidReq = this.reqValidation(req)
-    if (!isValidReq {
-      return res.status(400).send({message: "An id is needed to delete"});
+  public deleteItem = async (req: Request, res: Response) => {
+    const invalidDetails = this.validateReq(req);
+    if ( invalidDetails ) {
+      return res.status(400).send({message: invalidDetails});
     }
     try {
       const deletedSuccessfully: boolean = await this.model.deleteItem(this.redisKey, req.body.id);
       return deletedSuccessfully
         ? res.status(200).send({message: `Deleted ${req.body.id}`})
-        : res.status(500).send({message: `Could not delete ${req.body.id}`})
+        : res.status(500).send({message: `Could not delete ${req.body.id}`});
     } catch (err) {
       res.status(500).send({message: err});
     }
   }
+
+  validateReq = (req: Request): string | null => {
+    switch (req.method.toLowerCase()) {
+      case "post":
+      case "put":
+        const missingVals = this.missingValueFinder(req.body);
+        return missingVals.length
+          ? `Request is missing the following values: ${missingVals}`
+          : null;
+      case "delete":
+        if (!req.body || !req.body.id) {
+          return "Request is missing an ID";
+        }
+      default:
+        return null;
+    }
+  };
 }

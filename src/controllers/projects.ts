@@ -1,49 +1,37 @@
-import { Request, Response } from "express";
-import projectModel, {IProjectTuple} from "../models/projects";
+import { Request } from 'express'
+import model from '../models/Model'
+import { RedisKeys } from "../utils/redisConstants"
+import Controller, { IProjectItem } from "./Controller"
 
-interface IKeyVal {
-  [key: string]: string | number;
+interface ISubKeys {
+  [key: string]: string[]
+  specs: string[]
+  desc: string[]
 }
 
-interface ITransformedData {
-  title: string;
-  svg: string;
-  specs: IKeyVal[];
-  desc: IKeyVal[];
+const findMissingValues = (entry: IProjectItem) => {
+  const necessaryKeys: string[] = [
+    "title", "image", "specs", "desc"
+  ]
+
+  const subKeys: ISubKeys = {
+    specs: ["framework", "platform", "persistence"],
+    desc: ["Description", "Architecture", "Impact"]
+  }
+  const missingVals = []
+  
+  const checkSubKeys = (keyType: string, entry: IProjectItem) {
+    subKeys[keyType].forEach((key:string) => {
+      !entry[keyType][key] ?? missingVals.push(key)
+    })
+  }
+
+  entry.specs
+    ? checkSubKeys('specs', entry)
+    : missingVals.push('specs')
+
+  entry.desc
+    ? checkSubKeys('desc', entry)
+    : missingVals.push('specs')
+
 }
-
-export const getProjects = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const rawData = await projectModel.getProjects();
-    const transformedData = transformData(rawData);
-    return res.status(200).send(transformedData);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({message: err});
-  }
-};
-
-const transformData = (data: IProjectTuple[]): ITransformedData[] => {
-  const transformedData: ITransformedData[] = data.map( (d) => {
-    const {title, description, architecture, svg, impact, units, framework, platform} = d;
-    const specs: IKeyVal[] = [{title}, {framework}, {platform}, {units}];
-    const desc: IKeyVal[] = [{description}, {architecture}, {impact} ];
-    return {title, svg, specs, desc};
-  });
-  console.log(transformedData);
-  return transformedData;
-
-};
-
-export const addToProjects = async (req: Request, res: Response): Promise<Response> => {
-  return res.send({message: "this endpoint doesn't exist yet"});
-};
-
-const isValidReq = (reqBody: any): boolean => {
-  if (typeof reqBody !== "object") {
-    return false;
-  }
-  const requiredFields: string[] = [
-    "title", "svg", "platform", "framework", "units",
-  ];
-};

@@ -2,7 +2,6 @@ import * as bluebird from "bluebird";
 import * as redis from "redis";
 const redisAsync: any = bluebird.Promise.promisifyAll(redis);
 import shortid from "shortid";
-import {factory} from "../../ConfigLog4j";
 
 export interface IModel {
   getItems(key: string): Promise<any[]>;
@@ -15,13 +14,8 @@ interface IItem {
   [key: string]: any;
 }
 
-export default class Model implements IModel {
-  public logger: any;
+class Model implements IModel {
   public entity: any;
-  constructor(moduleName: string, entity: any) {
-    this.logger = factory.getLogger(`model.${moduleName}`);
-    this.entity = entity;
-  }
 
   public getItems = async (key: string): Promise<any[]> => {
     const client = this.createClient();
@@ -92,3 +86,7 @@ export default class Model implements IModel {
     return client;
   }
 }
+
+const model = new Model();
+
+export default model;
