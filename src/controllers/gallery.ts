@@ -1,9 +1,9 @@
 import {Request} from "express";
 import model from "../models/Model";
 import { RedisKeys } from "../utils/redisConstants";
-import Controller from "./Controller";
+import Controller, {IGalleryItem} from "./Controller";
 
-const findMissingValues = (entry: any): string[] => {
+const findMissingValues = (entry: IGalleryItem): string[] => {
   const necessaryValues: string[] = [
     "title",
     "desc",
@@ -12,7 +12,12 @@ const findMissingValues = (entry: any): string[] => {
     "image",
     "thumbnail"
   ];
-  const missingValues = necessaryValues.filter((v: string): boolean => entry[v] === undefined);
+
+  const missingValues = necessaryValues.filter((v: string): boolean => {
+    const val: string = (entry as any)[v];
+    return val === undefined;
+  });
+
   return missingValues;
 };
 

@@ -1,4 +1,6 @@
 export enum RedisKeys {
     Projects = "Projects",
-    Gallery = "Gallery"
+    Gallery = "Gallery",
+    Design = "Design",
+    Auth = "Auth", 
 }

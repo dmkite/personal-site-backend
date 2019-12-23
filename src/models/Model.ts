@@ -14,7 +14,7 @@ interface IItem {
   [key: string]: any;
 }
 
-class Model implements IModel {
+export class Model implements IModel {
   public entity: any;
 
   public getItems = async (key: string): Promise<any[]> => {

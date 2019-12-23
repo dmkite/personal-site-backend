@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {IModel} from "../models/Model";
 
 export interface IGalleryItem {
-  id: number;
+  id?: number;
   title: string;
   desc: string;
   height: number;
@@ -32,14 +32,14 @@ interface IController {
   addItem(req: Request, res: Response): Promise<Response>;
   updateItem(req: Request, res: Response): Promise<Response>;
   deleteItem(req: Request, res: Response): Promise<Response>;
-  validateReq(req:Request): string | null
+  validateReq(req: Request): string | null;
 }
 
 export default class Controller implements IController {
-  public missingValueFinder: (req: Request) => string[];
+  public missingValueFinder: (entry: IGalleryItem | IProjectItem) => string[];
   public redisKey: string;
   public model: IModel;
-  constructor(missingValueFinder: (req: Request) => string[], redisKey: string, model: IModel) {
+  constructor(missingValueFinder: (entry: IGalleryItem | IProjectItem) => string[], redisKey: string, model: IModel) {
     this.missingValueFinder = missingValueFinder;
     this.redisKey = redisKey;
     this.model = model;
@@ -103,7 +103,7 @@ export default class Controller implements IController {
     }
   }
 
-  validateReq = (req: Request): string | null => {
+  public validateReq = (req: Request): string | null => {
     switch (req.method.toLowerCase()) {
       case "post":
       case "put":
@@ -118,5 +118,6 @@ export default class Controller implements IController {
       default:
         return null;
     }
-  };
+  }
+
 }
