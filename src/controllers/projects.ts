@@ -1,49 +1,47 @@
-import { Request, Response } from "express";
-import projectModel, {IProjectTuple} from "../models/projects";
+import model from "../models/Model";
+import { RedisKeys } from "../utils/redisConstants";
+import Controller, { IProjectItem } from "./Controller";
 
-interface IKeyVal {
-  [key: string]: string | number;
+interface ISubKeys {
+  [key: string]: string[];
+  specs: string[];
+  desc: string[];
 }
 
-interface ITransformedData {
-  title: string;
-  svg: string;
-  specs: IKeyVal[];
-  desc: IKeyVal[];
-}
-
-export const getProjects = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const rawData = await projectModel.getProjects();
-    const transformedData = transformData(rawData);
-    return res.status(200).send(transformedData);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({message: err});
-  }
-};
-
-const transformData = (data: IProjectTuple[]): ITransformedData[] => {
-  const transformedData: ITransformedData[] = data.map( (d) => {
-    const {title, description, architecture, svg, impact, units, framework, platform} = d;
-    const specs: IKeyVal[] = [{title}, {framework}, {platform}, {units}];
-    const desc: IKeyVal[] = [{description}, {architecture}, {impact} ];
-    return {title, svg, specs, desc};
-  });
-  console.log(transformedData);
-  return transformedData;
-
-};
-
-export const addToProjects = async (req: Request, res: Response): Promise<Response> => {
-  return res.send({message: "this endpoint doesn't exist yet"});
-};
-
-const isValidReq = (reqBody: any): boolean => {
-  if (typeof reqBody !== "object") {
-    return false;
-  }
-  const requiredFields: string[] = [
-    "title", "svg", "platform", "framework", "units",
+const findMissingValues = (entry: IProjectItem): string[] => {
+  const necessaryKeys: string[] = [
+    "title", "image", "specs", "desc"
   ];
+
+  const subKeys: ISubKeys = {
+    desc: ["Description", "Architecture", "Impact"],
+    specs: ["framework", "platform", "persistence"]
+  };
+  const missingVals: string[] = [];
+
+  const checkSubKeys = (keyType: string): void => {
+    subKeys[keyType].forEach((key: string) => {
+       if (!(entry as any)[keyType][key]) {
+         missingVals.push(keyType);
+       }
+    });
+  };
+
+  necessaryKeys.forEach((val: string): void => {
+    if (val === "specs" || val === "desc") {
+      (entry as any)[val]
+        ? checkSubKeys(val)
+        : missingVals.push(val);
+    } else {
+      if (!(entry as any)[val]) {
+        missingVals.push(val);
+      }
+    }
+  });
+
+  return missingVals;
 };
+
+const projectController = new Controller(findMissingValues, RedisKeys.Projects, model);
+
+export default projectController;

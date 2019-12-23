@@ -1,96 +1,92 @@
-import {Connection, createConnection} from "typeorm";
-import { credentials } from "../../../credentials";
-import {factory} from "../../ConfigLog4j";
+import * as bluebird from "bluebird";
+import * as redis from "redis";
+const redisAsync: any = bluebird.Promise.promisifyAll(redis);
+import shortid from "shortid";
 
-interface IModel {
-  // logger: any
-  // entity: any
-  // returnType: any
-  // createConnection(): Promise<Connection | null>
-  getItems(): any;
-  addItem(item: any): Promise<boolean>;
-  updateItem(id: number): boolean;
-  deleteItem(id: number): boolean;
+export interface IModel {
+  getItems(key: string): Promise<any[]>;
+  addItem(key: string, entry: any): any;
+  updateItem(key: string, entry: any): Promise<boolean>;
+  deleteItem(key: string, id: number): Promise<boolean>;
 }
 
-export default class Model<T> implements IModel {
-  public logger: any;
+interface IItem {
+  [key: string]: any;
+}
+
+export class Model implements IModel {
   public entity: any;
-  // returnType: any
-  constructor(moduleName: string, entity: any) {
-    this.logger = factory.getLogger(`model.${moduleName}`);
-    this.entity = entity;
-    // this.returnType = returnType
 
-  }
-
-  public getItems = async (): Promise<T[]> => {
-    const connection: Connection | null = await this.createConnection();
-    if (!connection) {
-      return [];
-    }
+  public getItems = async (key: string): Promise<any[]> => {
+    const client = this.createClient();
     try {
-      const results = await connection.manager.find(this.entity);
-      if (!results || !results.length) {
-        return [];
-      }
+      const items = await client.hgetallAsync(key);
+      Object.keys(items).forEach((id: string) => {
+        items[id] = JSON.parse(items[id]);
+      });
+      return items;
     } catch (err) {
       console.log(err);
       return null;
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
     }
   }
 
-  public addItem = async (entry: any): Promise<boolean> => {
-    const connection: Connection | null = await this.createConnection();
-    if (!connection) {
-      return false;
-    }
+  public addItem = async (key: string, entry: any) => {
+    const client = this.createClient();
+    const id: string = shortid();
+    entry.id = id;
+    const jsonEntry: string = JSON.stringify(entry);
+    return client.hmsetAsync(key, [id, jsonEntry])
+    .then( (res: any) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err: any) => {
+      console.log(err);
+    });
+  }
+
+  public updateItem = async (key: string, entry: any): Promise<boolean> => {
+    const client = this.createClient();
     try {
-      let item = new this.entity();
-      item = Object.assign(item, entry);
-      await connection.manager.save(item);
-      this.logger.info(`successfully saved the following record\n${String(entry)}`);
+      const items = await this.getItems(key);
+      items[entry.id] = entry;
+      const updatedJsonEntry: string = JSON.stringify(entry);
+      await client.hmsetAsync(key, [entry.id, updatedJsonEntry]);
       return true;
     } catch (err) {
-      this.logger.error(err);
+      console.log(err);
       return false;
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
     }
-
   }
 
-  public updateItem = (id: number): boolean => {
-    return true;
-  }
-
-  public deleteItem = (id: number): boolean => {
-    return true;
-  }
-
-  private createConnection = async () => {
+  public deleteItem = async (key: string, id: number): Promise<boolean> => {
+    const client = this.createClient();
     try {
-      const connection: Connection = await createConnection({
-        database: "personal_site",
-        entities: [`${__dirname}/../entity/*.ts`],
-        host: "45.55.179.56",
-        logging: false,
-        password: credentials.mysqlPassword,
-        port: 3306,
-        synchronize: true,
-        type: "mysql",
-        username: "dylan"
-      });
-      return connection;
+      const items: IItem = await this.getItems(key);
+      if (!items) {
+        return false;
+      }
+      client.hdelAsync(key, id);
+      return true;
     } catch (err) {
       console.log(err);
-      return null;
+      return false;
     }
   }
+
+  public createClient = () => {
+    const redisOptions = {
+      db: 1,
+      host: "127.0.0.1",
+      port: 6379,
+
+    };
+    const client = redisAsync.createClient(redisOptions);
+    return client;
+  }
 }
+
+const model = new Model();
+
+export default model;

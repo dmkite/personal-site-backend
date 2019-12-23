@@ -1,9 +1,13 @@
 import express from "express";
 const router = express.Router();
-import {addToGallery, getGallery} from "../controllers/gallery";
+import galleryController from "../controllers/gallery";
 
-router.get("/", getGallery);
+router.get("/", galleryController.getItems);
 
-router.post("/", addToGallery);
+router.post("/", galleryController.addItem);
+
+router.put("/", galleryController.updateItem);
+
+router.delete("/", galleryController.deleteItem);
 
 export default router;
