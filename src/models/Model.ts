@@ -15,8 +15,6 @@ interface IItem {
 }
 
 export class Model implements IModel {
-  public entity: any;
-
   public getItems = async (key: string): Promise<any[]> => {
     const client = this.createClient();
     try {
