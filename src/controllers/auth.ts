@@ -1,44 +1,53 @@
-import authModel from '../models/auth'
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
+import {Request, Response} from "express";
+import authModel from "../models/auth";
 
 interface IAuthController {
-  changePassword(oldPassword: string, newPassword: string): Promise<boolean>
-  hashify(password: string): Promise<string>
-  passwordsMatch(password: string): Promise<boolean>
+  changePassword(req: Request, res: Response): Promise<Response>;
+  hashify(password: string): Promise<string>;
+  passwordsMatch(password: string): Promise<boolean>;
 }
 
 class AuthController implements IAuthController {
-  saltRounds: number
+  public saltRounds: number;
   constructor() {
-    this.saltRounds = 10
+    this.saltRounds = 10;
   }
 
-  changePassword = async (password: string): Promise<boolean> => {
+  public changePassword = async (req: Request, res: Response): Promise<Response> => {
+    if (!req.body || !req.body.password) {
+      return res.status(400).send({message: "A new password is needed"});
+    }
     try {
-      if (this.passwordsMatch(password)) {
-        
+      const hashedPassword: string = await this.hashify(req.body.password);
+      if (this.passwordsMatch(hashedPassword)) {
+        const changedPassword: boolean = await authModel.changePassword(hashedPassword);
+        if (changedPassword) {
+          return res.status(200).send({message: "Successfully updated password"});
+        } else {
+          return res.status(500).send({message: "Failed to update password"});
+        }
       }
-    } catch(err) {
-
-    }
-  }
-
-  hashify = async (password: string): Promise<string> => {
-    try {
-      const hashedPassword: string = await bcrypt.hash(password, this.saltRounds)
-      return hashedPassword
     } catch (err) {
-      console.log(err)
-      return null
+      return res.status(500).send({message: err});
     }
   }
 
-  passwordsMatch = async(password:string): Promise<boolean> => {
-    const storedPassword: string = await authModel.getPassword()
-    const hashedPassword: string = await this.hashify(password)
-    return storedPassword === hashedPassword
+  public hashify = async (password: string): Promise<string> => {
+    try {
+      const hashedPassword: string = await bcrypt.hash(password, this.saltRounds);
+      return hashedPassword;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
+  public passwordsMatch = async (password: string): Promise<boolean> => {
+    const storedPassword: string = await authModel.getPassword();
+    return storedPassword === password;
   }
 }
 
-const authController = new AuthController()
-export default authController
+const authController = new AuthController();
+export default authController;
