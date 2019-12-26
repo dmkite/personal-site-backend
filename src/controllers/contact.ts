@@ -31,7 +31,7 @@ class ContactController {
   }
 
   public checkToken = (token: string): boolean => {
-    const decoded: any = jwt.verify(token, credentials.privateKey);
+    const decoded: any = jwt.verify(token, credentials.secret);
     if (decoded) {
       console.log(decoded);
       return Number(decoded.timestamp) - Date.now() > 300000;
@@ -41,7 +41,7 @@ class ContactController {
   }
 
   public createToken = (): string => {
-    const token = jwt.sign({timestamp: Date.now()}, credentials.privateKey);
+    const token = jwt.sign({timestamp: Date.now()}, credentials.secret);
     return token;
   }
 
