@@ -56,11 +56,10 @@ class ContactModel {
     this.emailParams.Message.Body.Text.Data = formattedMsg;
 
     try {
-      const result = await this.ses.sendEmail(this.emailParams).promise();
-      console.log({result});
+      await this.ses.sendEmail(this.emailParams).promise();
       return true;
     } catch (err) {
-      console.log({err});
+      console.error(err);
       return false;
     }
   }

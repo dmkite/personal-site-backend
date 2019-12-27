@@ -2,60 +2,58 @@ import * as bluebird from "bluebird";
 import * as redis from "redis";
 const redisAsync: any = bluebird.Promise.promisifyAll(redis);
 import shortid from "shortid";
+import { IGalleryItem, IParsedRedisHash, IProjectItem, IStringRedisHash } from "../controllers/Controller";
 
 export interface IModel {
-  getItems(key: string): Promise<any[]>;
-  addItem(key: string, entry: any): any;
-  updateItem(key: string, entry: any): Promise<boolean>;
+  getItems(key: string): Promise<IParsedRedisHash>;
+  addItem(key: string, entry: IGalleryItem | IProjectItem): Promise<boolean>;
+  updateItem(key: string, entry: IGalleryItem | IProjectItem): Promise<boolean>;
   deleteItem(key: string, id: number): Promise<boolean>;
 }
 
-interface IItem {
-  [key: string]: any;
-}
-
 export class Model implements IModel {
-  public entity: any;
-
-  public getItems = async (key: string): Promise<any[]> => {
+  public getItems = async (key: string): Promise<IParsedRedisHash> => {
     const client = this.createClient();
     try {
-      const items = await client.hgetallAsync(key);
-      Object.keys(items).forEach((id: string) => {
-        items[id] = JSON.parse(items[id]);
-      });
-      return items;
+      const items: IStringRedisHash = await client.hgetallAsync(key);
+      const parsedItems: IParsedRedisHash = Object.keys(items).reduce(
+        (acc: IParsedRedisHash, id: string): IParsedRedisHash => {
+          acc[id] = JSON.parse(items[id]);
+          return acc;
+        }, {});
+      return parsedItems;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return null;
     }
   }
 
-  public addItem = async (key: string, entry: any) => {
+  public addItem = async (key: string, entry: IGalleryItem | IProjectItem): Promise<boolean> => {
     const client = this.createClient();
     const id: string = shortid();
     entry.id = id;
+
     const jsonEntry: string = JSON.stringify(entry);
-    return client.hmsetAsync(key, [id, jsonEntry])
-    .then( (res: any) => {
-      console.log(res);
-      return res;
-    })
-    .catch((err: any) => {
-      console.log(err);
-    });
+    try {
+      await client.hmsetAsync(key, [id, jsonEntry]);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+
   }
 
-  public updateItem = async (key: string, entry: any): Promise<boolean> => {
+  public updateItem = async (key: string, entry: IGalleryItem | IProjectItem): Promise<boolean> => {
     const client = this.createClient();
     try {
-      const items = await this.getItems(key);
+      const items: IParsedRedisHash = await this.getItems(key);
       items[entry.id] = entry;
       const updatedJsonEntry: string = JSON.stringify(entry);
       await client.hmsetAsync(key, [entry.id, updatedJsonEntry]);
       return true;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return false;
     }
   }
@@ -63,14 +61,14 @@ export class Model implements IModel {
   public deleteItem = async (key: string, id: number): Promise<boolean> => {
     const client = this.createClient();
     try {
-      const items: IItem = await this.getItems(key);
+      const items: IParsedRedisHash = await this.getItems(key);
       if (!items) {
         return false;
       }
       client.hdelAsync(key, id);
       return true;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return false;
     }
   }
