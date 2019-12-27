@@ -22,12 +22,11 @@ class AuthController implements IAuthController {
     if (!req.body || !req.body.newPassword || !req.body.oldPassword) {
       return res.status(400).send({ message: "New and old passwords are required" });
     }
-    console.log("hitting change password with ", req.body.password);
+    const {oldPassword, newPassword} = req.body;
     try {
-      const hashedOldPassword: string = await this.hashify(req.body.oldPassword);
-      const passwordsMatch: boolean = await this.passwordsMatch(hashedOldPassword);
+      const passwordsMatch: boolean = await this.passwordsMatch(oldPassword);
       if (passwordsMatch) {
-        const hashedNewPassword: string = await this.hashify(req.body.newPassword);
+        const hashedNewPassword: string = await this.hashify(newPassword);
         const changedPassword: boolean = await authModel.changePassword(hashedNewPassword);
         if (changedPassword) {
           return res.status(200).send({ message: "Successfully updated password" });
@@ -47,8 +46,7 @@ class AuthController implements IAuthController {
       return res.status(400).send({ message: "Provide a password" });
     }
     try {
-      const hashedPassword: string = await this.hashify(req.body.password);
-      const passwordsMatch: boolean = await this.passwordsMatch(hashedPassword);
+      const passwordsMatch: boolean = await this.passwordsMatch(req.body.password);
       if (passwordsMatch) {
         const token: string = this.createToken();
         return res.status(200).send({ token });
@@ -61,10 +59,10 @@ class AuthController implements IAuthController {
   }
 
   public authenticate = (req: Request, res: Response, next: NextFunction): Response | void => {
-    if (!req.headers || !req.headers.Authorization) {
+    if (!req.headers || !req.headers.authorization) {
       return res.status(401).send({ message: "No bearer token present" });
     }
-    const [type, token]: string[] = (req.headers.Authorization as string).split(" ");
+    const [type, token]: string[] = (req.headers.authorization as string).split(" ");
     const decoded: any = jwt.verify(token, credentials.secret);
     if (Date.now() - decoded.timestamp > this.twentyFourHours) {
       return res.status(401).send({ message: "Reauthorization required" });
@@ -75,7 +73,6 @@ class AuthController implements IAuthController {
   private hashify = async (password: string): Promise<string> => {
     try {
       const hashedPassword: string = await bcrypt.hash(password, this.saltRounds);
-      console.log("hashed password is: ", hashedPassword);
       return hashedPassword;
     } catch (err) {
       console.log(err);
@@ -84,17 +81,21 @@ class AuthController implements IAuthController {
   }
 
   private passwordsMatch = async (password: string): Promise<boolean> => {
-    const storedPassword: string = await authModel.getPassword();
-    console.log(storedPassword);
-    console.log(password);
-    return storedPassword === password;
+    try {
+      const storedPassword: string = await authModel.getPassword();
+      const passwordsMatch: boolean = await bcrypt.compare(password, storedPassword);
+      return passwordsMatch;
+
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   private createToken = (): string => {
     const token = jwt.sign({ timestamp: Date.now() }, credentials.secret);
     return token;
   }
-
 }
 
 const authController = new AuthController();

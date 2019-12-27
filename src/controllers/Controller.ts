@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {IModel} from "../models/Model";
 
 export interface IGalleryItem {
-  id?: number;
+  id?: string;
   title: string;
   desc: string;
   height: number;
@@ -12,6 +12,7 @@ export interface IGalleryItem {
 }
 
 export interface IProjectItem {
+  id?: string;
   title: string;
   image: string;
   specs: {
@@ -25,6 +26,14 @@ export interface IProjectItem {
     Architecture: string
     Impact: string
   };
+}
+
+export interface IStringRedisHash {
+  [key: string]: string;
+}
+
+export interface IParsedRedisHash {
+  [key: string]: IGalleryItem | IProjectItem;
 }
 
 interface IController {
@@ -47,7 +56,7 @@ export default class Controller implements IController {
 
   public getItems = async (req: Request, res: Response) => {
     try {
-      const items: Array<IGalleryItem | IProjectItem> = await this.model.getItems(this.redisKey);
+      const items: IParsedRedisHash = await this.model.getItems(this.redisKey);
       if (!items) {
         return res.status(404).send({message: "no items found"});
       } else {
