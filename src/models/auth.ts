@@ -17,7 +17,7 @@ class AuthModel extends Model implements IAuthModel {
       const password = await client.getAsync(RedisKeys.Auth);
       return password;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return null;
     }
   }
@@ -28,7 +28,7 @@ class AuthModel extends Model implements IAuthModel {
       await client.setAsync(RedisKeys.Auth, newPassword);
       return true;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return false;
     }
   }

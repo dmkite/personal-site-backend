@@ -75,7 +75,7 @@ class AuthController implements IAuthController {
       const hashedPassword: string = await bcrypt.hash(password, this.saltRounds);
       return hashedPassword;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return null;
     }
   }
@@ -87,7 +87,7 @@ class AuthController implements IAuthController {
       return passwordsMatch;
 
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return false;
     }
   }
