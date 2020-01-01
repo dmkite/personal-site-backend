@@ -15,6 +15,7 @@ const log = factory.getLogger("server");
 const port: string = process.env.PORT || "8080";
 const app = express();
 
+app.use(express.static(process.env.PATH_TO_BUILD));
 app.disable("x-powered-by");
 app.use(cors());
 app.use(morgan("dev"));
