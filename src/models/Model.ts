@@ -17,7 +17,7 @@ export class Model implements IModel {
     try {
       const items: IStringRedisHash = await client.hgetallAsync(key);
       if (!items) {
-        return null
+        return null;
       }
       const parsedItems: IParsedRedisHash = Object.keys(items).reduce(
         (acc: IParsedRedisHash, id: string): IParsedRedisHash => {
@@ -51,8 +51,8 @@ export class Model implements IModel {
     const client = this.createClient();
     try {
       const items: IParsedRedisHash = await this.getItems(key);
-      if(!items) {
-        return false
+      if (!items) {
+        return false;
       }
       items[entry.id] = entry;
       const updatedJsonEntry: string = JSON.stringify(entry);
