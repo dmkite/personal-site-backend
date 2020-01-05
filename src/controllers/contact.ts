@@ -12,19 +12,19 @@ class ContactController {
 
     let hasWaited: boolean = true;
     if (reqToken) { hasWaited = this.checkToken(reqToken); }
-    if (!hasWaited) { return res.status(429).send({message: "You've been doing that alot. Wait a little while and try again"}); }
+    if (!hasWaited) { return res.status(429).send({message: "You've been doing that alot. Wait a little while and try again."}); }
 
     const isValidReq: boolean = this.isValidReq(name, email, msg);
     if (!isValidReq) {
       return res.status(400).send({message: "name, email, or message are incorrectly formatted"});
     }
     try {
-      const messageDidSend = await contactModel.sendMessage(name, email, msg);
+      const messageDidSend: boolean = await contactModel.sendMessage(name, email, msg);
       if (messageDidSend) {
         const token = this.createToken();
         return res.status(201).send({message: "message sent", token });
       }
-      return res.status(500).send({meresultssage: "message was not sent"});
+      return res.status(500).send({message: "message was not sent"});
     } catch (err) {
       return res.status(500).send({message: err});
     }
@@ -32,8 +32,9 @@ class ContactController {
 
   public checkToken = (token: string): boolean => {
     const decoded: any = jwt.verify(token, credentials.secret);
+    console.log(decoded)
     if (decoded) {
-      return Number(decoded.timestamp) - Date.now() > 300000;
+      return Date.now() - Number(decoded.timestamp) > 300000;
     } else {
       return false;
     }

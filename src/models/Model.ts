@@ -19,9 +19,12 @@ export class Model implements IModel {
       if (!items) {
         return null;
       }
+      console.log(Array.isArray(items));
       const parsedItems: IParsedRedisHash = Object.keys(items).reduce(
         (acc: IParsedRedisHash, id: string): IParsedRedisHash => {
-          acc[id] = JSON.parse(items[id]);
+          acc[id] = typeof items[id] === "string"
+            ? JSON.parse(items[id])
+            : items[id];
           return acc;
         }, {});
       return parsedItems;
