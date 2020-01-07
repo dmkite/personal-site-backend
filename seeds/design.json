@@ -1,9 +1,14 @@
 {
-    "id": {
-        "id": "",
-        "title":"",
-        "images":"",
-        "desc":"",
+    "tjvmuO_D": {
+        "id": "tjvmuO_D",
+        "title":"Kidogo Mobile App Design",
+        "images":[
+            "../../assets/design/ui.gif",
+            "../../assets/design/sunrise.png",
+            "../../assets/design/enrollment.png",
+            "../../assets/design/finances.png"
+        ],
+        "desc":"The Kidogo Mobile App was designed for folks with Kenyan women in their 20's to 50's with limited literacy - because of this iconography and the UI needed to be instantly understandable. This posed a significant challenge as we were separated by language and culture; what they readily recognized would be lost in my context. Extensive research and vetting went in to the design work, which ended up being a mix of English, Swahili, iconography, and audio cues.",
         "impact":""
     }
 }

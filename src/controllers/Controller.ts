@@ -28,12 +28,20 @@ export interface IProjectItem {
   };
 }
 
+export interface IDesignItem {
+  [key: string]: string | string[];
+  title: string;
+  images: string[];
+  desc: string;
+  impact: string;
+}
+
 export interface IStringRedisHash {
   [key: string]: string;
 }
 
 export interface IParsedRedisHash {
-  [key: string]: IGalleryItem | IProjectItem;
+  [key: string]: IGalleryItem | IProjectItem | IDesignItem;
 }
 
 interface IController {
@@ -45,10 +53,13 @@ interface IController {
 }
 
 export default class Controller implements IController {
-  public missingValueFinder: (entry: IGalleryItem | IProjectItem) => string[];
+  public missingValueFinder: (entry: IGalleryItem | IProjectItem | IDesignItem) => string[];
   public redisKey: string;
   public model: IModel;
-  constructor(missingValueFinder: (entry: IGalleryItem | IProjectItem) => string[], redisKey: string, model: IModel) {
+  constructor(missingValueFinder: (
+    entry: IGalleryItem | IProjectItem | IDesignItem) => string[],
+              redisKey: string,
+              model: IModel) {
     this.missingValueFinder = missingValueFinder;
     this.redisKey = redisKey;
     this.model = model;
