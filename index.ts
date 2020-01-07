@@ -17,7 +17,7 @@ const log = factory.getLogger("server");
 const port: string = process.env.PORT || "8080";
 const app = express();
 
-const root: string = path.join("..", "front-end", "build");
+const root: string = process.env.ROOT || path.join("..", "front-end", "build");
 app.use(express.static(root));
 app.disable("x-powered-by");
 app.use(cors());

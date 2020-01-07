@@ -11,9 +11,9 @@ const findMissingVals = (entry: IDesignItem): string[] => {
   ];
   const missingVals: string[] = necessaryVals.reduce((acc: string[], v: string): string[] => {
     if (!entry[v] || !entry[v].length) {
-      acc.push(v)
+      acc.push(v);
     }
-    return acc
+    return acc;
   }, []);
   return missingVals;
 };
