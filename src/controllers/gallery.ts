@@ -1,4 +1,3 @@
-import {Request} from "express";
 import model from "../models/Model";
 import { RedisKeys } from "../utils/redisConstants";
 import Controller, {IGalleryItem} from "./Controller";

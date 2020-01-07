@@ -32,7 +32,7 @@ class ContactController {
 
   public checkToken = (token: string): boolean => {
     const decoded: any = jwt.verify(token, credentials.secret);
-    console.log(decoded)
+    console.log(decoded);
     if (decoded) {
       return Date.now() - Number(decoded.timestamp) > 300000;
     } else {
