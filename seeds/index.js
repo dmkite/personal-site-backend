@@ -6,15 +6,21 @@ const redis = require('redis')
 
 const main = () => {
   const redisClient = createClient()
-  Object.keys(projects).forEach(p => {
+  console.log('redis client created')
+  Object.keys(projects).forEach((p, i) => {
+    console.log(`writing project ${i + 1} of ${Object.keys(projects).length}`)
     setItems(redisClient, p, 'Projects')
   })
-  Object.keys(gallery).forEach(g => {
+  Object.keys(gallery).forEach((g, i) => {
+    console.log(`writing gallery item ${i + 1} of ${Object.keys(gallery).length}`)
     setItems(redisClient, g, 'Gallery')
   })
-  Object.keys(design).forEach(d => {
+  Object.keys(design).forEach((d, i) => {
+    console.log(`writing design project ${i + 1} of ${Object.keys(design).length}`)
     setItems(redisClient, d, 'Design')
   })
+  redisClient.quit()
+  console.log('closing redis client')
 }
 
 
@@ -33,8 +39,10 @@ const setItems = (rC, entry, key) => {
   if (!entry.id) {
     entry.id = shortid()
   }
-  const stringifiedEntry = JSON.stringify(entry)
-  rC.hset(key, [id, stringifiedEntry])
+  const stringifiedEntry = typeof entry === 'string'
+    ? entry
+    : JSON.stringify(entry)
+  rC.hset(key, [id, stringifiedEntry], rC.print)
 }
 
 main()
