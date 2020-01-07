@@ -4,20 +4,24 @@ const gallery = require('./gallery.json')
 const design = require('./design.json')
 const redis = require('redis')
 
-const main = () => {
+const main = (toSeed) => {
+  if (toSeed !== 'Projects' && toSeed !== 'Gallery' && toSeed !== 'Design') {
+    console.error(`incorrect seed type: ${toSeed}`)
+    return false
+  }
   const redisClient = createClient()
   console.log('redis client created')
-  Object.keys(projects).forEach((p, i) => {
-    console.log(`writing project ${i + 1} of ${Object.keys(projects).length}`)
-    setItems(redisClient, p, 'Projects')
-  })
-  Object.keys(gallery).forEach((g, i) => {
-    console.log(`writing gallery item ${i + 1} of ${Object.keys(gallery).length}`)
-    setItems(redisClient, g, 'Gallery')
-  })
-  Object.keys(design).forEach((d, i) => {
-    console.log(`writing design project ${i + 1} of ${Object.keys(design).length}`)
-    setItems(redisClient, d, 'Design')
+  const seedMap = {
+    Projects: projects,
+    Design: design,
+    Gallery: gallery
+  }
+
+  const seeds = seedMap[toSeed]
+  Object.keys(seeds).forEach((s, i) => {
+    console.log(seeds[s])
+    console.log(`writing item ${i + 1} of ${Object.keys(seeds).length}`)
+    setItems(redisClient, seeds[s], toSeed)
   })
   redisClient.quit()
   console.log('closing redis client')
@@ -42,7 +46,9 @@ const setItems = (rC, entry, key) => {
   const stringifiedEntry = typeof entry === 'string'
     ? entry
     : JSON.stringify(entry)
+
+    console.log(stringifiedEntry)
   rC.hset(key, [id, stringifiedEntry], rC.print)
 }
 
-main()
+module.exports = {main}

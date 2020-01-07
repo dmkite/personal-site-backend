@@ -10,7 +10,9 @@
     "start": "ts-node .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:watch": "nodemon",
-    "seed": "node ./seeds"
+    "seed:Projects": "node -e 'require(\"./seeds\").main(\"Projects\")'",
+    "seed:Gallery": "node -e 'require(\"./seeds\").main(\"Gallery\")'",
+    "seed:Design": "node -e 'require(\"./seeds\").main(\"Design\")'"
   },
   "repository": {
     "type": "git",
