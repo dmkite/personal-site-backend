@@ -1,25 +1,25 @@
 {
-    "tjvmuO_D": {
-        "id": "tjvmuO_D",
-        "title":"Kidogo Mobile App Design",
-        "images":[
-            "../../assets/design/signin.gif",
-            "../../assets/design/enrollment.gif",
-            "../../assets/design/attendance.gif",
-            "../../assets/design/accounts.gif"
-        ],
-        "desc":"The Kidogo Mobile App was designed for folks with Kenyan women with limited literacy - because of this iconography and the UI needed to be instantly understandable despite a significant language and culture barrier.",
-        "impact":"Extensive research and vetting went in to the design work, the final product a mix of English, Swahili, iconography, and audio cues - all easily understood by users."
-    },
-    "UkgawL_J": {
-        "id": "UkgawL_J",
-        "title": "HPGella Logo Design",
-        "images": [
-            "../../assets/design/logo-ideation.jpg",
-            "../../assets/design/hpgella-logo.jpg",
-            "../../assets/design/hpgella-use.jpg",
-        ],
-        "desc": "One of Seattle's top Pharma-testimonial companies needed a dazzling and contemporary logo to be the face of their annual morale booster event",
-        "impact": "For two years over 100 branded totes and a 6x6 foot banner served as an emblem for a day-long Coachella-like micro music festival."
-    }
+  "tjvmuO_D": {
+    "id": "tjvmuO_D",
+    "title": "Kidogo Mobile App Design",
+    "images": [
+      "../../assets/design/signin.gif",
+      "../../assets/design/enrollment.gif",
+      "../../assets/design/attendance.gif",
+      "../../assets/design/accounts.gif"
+    ],
+    "desc": "The Kidogo Mobile App was designed for folks with Kenyan women with limited literacy - because of this iconography and the UI needed to be instantly understandable despite a significant language and culture barrier.",
+    "impact": "Extensive research and vetting went in to the design work, the final product a mix of English, Swahili, iconography, and audio cues - all easily understood by users."
+  },
+  "UkgawL_J": {
+    "id": "UkgawL_J",
+    "title": "HPGella Logo Design",
+    "images": [
+      "../../assets/design/logo-ideation.jpg",
+      "../../assets/design/hpgella-logo.jpg",
+      "../../assets/design/hpgella-use.jpg"
+    ],
+    "desc": "One of Seattle's top Pharma-testimonial companies needed a dazzling and contemporary logo to be the face of their annual morale booster event",
+    "impact": "For two years over 100 branded totes and a 6x6 foot banner served as an emblem for a day-long Coachella-like micro music festival."
+  }
 }
