@@ -35,7 +35,6 @@ app.get("/ping", (req, res) => {
 });
 
 app.get("/assets/*", (req, res) => {
-  (req.url);
   return res.sendFile(req.url, {root: path.join("..")});
 });
 

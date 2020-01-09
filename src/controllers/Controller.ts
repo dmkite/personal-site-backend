@@ -56,10 +56,10 @@ export default class Controller implements IController {
   public missingValueFinder: (entry: IGalleryItem | IProjectItem | IDesignItem) => string[];
   public redisKey: string;
   public model: IModel;
-  constructor(missingValueFinder: (
-    entry: IGalleryItem | IProjectItem | IDesignItem) => string[],
-              redisKey: string,
-              model: IModel) {
+  constructor(
+    missingValueFinder: (entry: IGalleryItem | IProjectItem | IDesignItem) => string[],
+    redisKey: string,
+    model: IModel) {
     this.missingValueFinder = missingValueFinder;
     this.redisKey = redisKey;
     this.model = model;
