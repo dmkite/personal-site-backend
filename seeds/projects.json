@@ -25,8 +25,8 @@
       "units": 16
     },
     "desc": {
-      "Description": "A digital kiosk that allows customers to find products, amenities, and restaurants in one of North America's top high-end retailers flagship stores.",
-      "Architecture": "The Electron-based desktop app for 55-inch touchscreen display features a React app that synthesizes data from a Java product information API and caches data via Redis. Extensive metrics and analytics from Datadog, Splunk, and ClickStream provide a granular insight into exactly how users interface with the solution.",
+      "Description": "A digital kiosk that allows customers to find products, amenities, and restaurants in one of North America's top retailer's flagship store.",
+      "Architecture": "The Electron-based desktop app for a 55-inch touchscreen display features a React app that synthesizes data from a Java product information API and caches data via Redis. Extensive metrics and analytics from Datadog, Splunk, and ClickStream provide a granular insight into exactly how users interface with the solution.",
       "Impact": "16 units across two stores have provide a delightful experience across an average of 3,000 monthly sessions per device. Cutting-edge React technology provides an exception-safe experience and a powerful insight into customer behavior provides uniquely valuable data."
     }
   },
@@ -41,9 +41,9 @@
       "units": "100+"
     },
     "desc": {
-      "Description": " is displayed on a mounted iPad - allowing customers to request help, alterations, or other services from sales associates without ever having to leave the comfor of their dressing room.",
+      "Description": "The Fitting Room Assistant is displayed on a mounted iPad - allowing customers to request help, alterations, or other services from sales associates without ever leaving the comfort of their dressing room.",
       "Architecture": "A React Native iOS app serves as a light-weight UI sending user input via HTTP request to an integrated voice service.  Staff can hear incoming requests for help and answer calls for assistance instantly from a headset.",
-      "Impact": "Customers in 12 retail stores across North America have gained a sense of control of their shopping experience; summoning help with the press of a button."
+      "Impact": "Customers in 12 retail stores across North America have gained a sense of control of their shopping experience; summoning help with the press of a button."	
     }
   },
   "q5Hjd9xz": {
@@ -58,7 +58,7 @@
     },
     "desc": {
       "Description": "A web app serves as a central hub to view department-specific data on which employees are assisting different fitting rooms.",
-      "Architecture": "The React app gathers employee data from an internal API, determines which employees have currently punched in for a shift, and allows them to be paired with fitting rooms. When a pairing occurs employees are notified by headset instnatly via an integrated voice service",
+      "Architecture": "The React app gathers employee data from an internal API, determines which employees have currently punched in for a shift, and allows them to be paired with fitting rooms. When a pairing occurs employees are notified by headset instantly via an integrated voice service",
       "Impact": "Employees in 12 retail stores across North America can quickly dispatch sales associates to assist customers in dressing rooms."
     }
   }
