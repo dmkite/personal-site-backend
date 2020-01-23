@@ -1,5 +1,6 @@
 {
   "nlDalzXm": {
+    "order": 1,
     "id": "nlDalzXm",
     "title": "Kidogo Mobile App",
     "image": "android",
@@ -12,9 +13,14 @@
       "Description": "As the sole developer I owned discovery work with users & stakeholders, designed, developed, and delivered the Kidogo Mobile App prototype; a childcare Swiss army knife. The app offers digital and automated solutions for enrollment, payments, attendance, and finance tracking.",
       "Architecture": "Limited funds and rapidly growing clientele necessitated an affordable, scalable solution. The Kidogo app is a serverless, offline-first React Native app. When users have access to wifi they send data via HTTP request, triggering a Node/Express Lambda, and persisting data through DynamoDB ensuring Kidogo only pays for what it uses.",
       "Impact": "The prototype is currently being user tested by 30 participants across multiple childcare centers in Kenya. Development continues after the rigorous onboarding I provided to new freelance developers to support continuous integration and development."
+    },
+    "links": {
+      "github": "https://github.com/dmkite/Kidogo-Deployed",
+      "download": "../../assets/kidogo/kidogo-mobile-app.apk"
     }
   },
   "tTqqKl_i": {
+    "order": 2,
     "id": "tTqqKl_i",
     "title": "Digital Directory",
     "image": "windows",
@@ -27,10 +33,11 @@
     "desc": {
       "Description": "A digital kiosk that allows customers to find products, amenities, and restaurants in one of North America's top retailer's flagship store.",
       "Architecture": "The Electron-based desktop app for a 55-inch touchscreen display features a React app that synthesizes data from a Java product information API and caches data via Redis. Extensive metrics and analytics from Datadog, Splunk, and ClickStream provide a granular insight into exactly how users interface with the solution.",
-      "Impact": "16 units across two stores have provide a delightful experience across an average of 3,000 monthly sessions per device. Cutting-edge React technology provides an exception-safe experience and a powerful insight into customer behavior provides uniquely valuable data."
+      "Impact": "16 units across two stores provide a delightful experience across an average of 3,000 monthly sessions per device. Cutting-edge React technology provides an exception-safe experience and a powerful insight into customer behavior provides uniquely valuable data."
     }
   },
   "vtO9s0gd": {
+    "order": 3,
     "id": "vtO9s0gd",
     "title": "Fitting Room Assistant",
     "image": "ios",
@@ -41,12 +48,13 @@
       "units": "100+"
     },
     "desc": {
-      "Description": "The Fitting Room Assistant is displayed on a mounted iPad - allowing customers to request help, alterations, or other services from sales associates without ever leaving the comfort of their dressing room.",
+      "Description": "The Fitting Room Assistant is displayed on a mounted tablet - allowing customers to request help, alterations, or other services from sales associates without ever leaving the comfort of their dressing room.",
       "Architecture": "A React Native iOS app serves as a light-weight UI sending user input via HTTP request to an integrated voice service.  Staff can hear incoming requests for help and answer calls for assistance instantly from a headset.",
-      "Impact": "Customers in 12 retail stores across North America have gained a sense of control of their shopping experience; summoning help with the press of a button."	
+      "Impact": "Customers in 12 retail stores across North America have gained a sense of control of their shopping experience. Across 3,000 monthly sessions assistance and alterations have been provided with 95% of customers rating their experience 5 stars."	
     }
   },
   "q5Hjd9xz": {
+    "order": 4,
     "id": "q5Hjd9xz",
     "title": "Fitting Room Assistant Controller",
     "image": "web",
@@ -54,12 +62,12 @@
       "framework": "React",
       "platform": "Web",
       "persistence": "N/A",
-      "units": "30+"
+      "units": "14"
     },
     "desc": {
-      "Description": "A web app serves as a central hub to view department-specific data on which employees are assisting different fitting rooms.",
-      "Architecture": "The React app gathers employee data from an internal API, determines which employees have currently punched in for a shift, and allows them to be paired with fitting rooms. When a pairing occurs employees are notified by headset instantly via an integrated voice service",
-      "Impact": "Employees in 12 retail stores across North America can quickly dispatch sales associates to assist customers in dressing rooms."
+      "Description": "A web app serves as a central hub to view department-specific data allowing department managers to orchestrate an effective and efficient team of sales associates.",
+      "Architecture": "The React app gathers employee data from an internal API, determines which employees have currently punched in for a shift, and allows them to be paired with fitting rooms with the push of a button. When a pairing occurs, employees are notified by headset instantly allowing for prompt, delightful service.",
+      "Impact": "Employees in 12 retail stores across North America can quickly dispatch sales associates to assist customers in dressing rooms pairing nearly 130 employees to fitting rooms each month."
     }
   }
 }

@@ -13,6 +13,7 @@ export interface IGalleryItem {
 
 export interface IProjectItem {
   id?: string;
+  order: number;
   title: string;
   image: string;
   specs: {
@@ -20,6 +21,11 @@ export interface IProjectItem {
     framework: string
     platform: string
     persistence: string
+  };
+  links?: {
+    github?: string
+    download?: string
+    livelink?: string
   };
   desc: {
     Description: string
