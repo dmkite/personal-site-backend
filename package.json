@@ -26,7 +26,7 @@
   "homepage": "https://github.com/dmkite/personal-site-backend#readme",
   "dependencies": {
     "@types/redis": "^2.8.14",
-    "aws-sdk": "^2.573.0",
+    "aws-sdk": "^2.814.0",
     "bcrypt": "^3.0.7",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
